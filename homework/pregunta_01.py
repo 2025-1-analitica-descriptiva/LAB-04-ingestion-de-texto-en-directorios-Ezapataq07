@@ -4,7 +4,10 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
-
+import os
+import zipfile
+import glob
+from pprint import pprint
 
 def pregunta_01():
     """
@@ -71,3 +74,31 @@ def pregunta_01():
 
 
     """
+    
+    zip_path = os.path.join("files", "input.zip")
+    extract_path = "files"
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_path)
+    
+    if not os.path.exists('files/output'):
+        os.mkdir('files/output')
+    with open('files/output/train_dataset.csv','w') as f:
+        f.write(',phrase,target\n')
+    with open('files/output/test_dataset.csv','w') as f:
+        f.write(',phrase,target\n')
+
+    for folder in glob.glob('files/input/*'):
+        for subfolder in glob.glob(f'{folder}/*'):
+            for file in glob.glob(f'{subfolder}/*'):
+                with open(file, 'r', encoding='utf-8') as f:
+                    dataset = folder.split('/')[-1]
+                    sentiment = subfolder.split('/')[-1]
+                    index = int(file.split('/')[-1].split('.')[0])
+                    text = f.readlines()[0].strip()
+                    # files_dict[dataset][sentiment] = files_dict.get(dataset, {}).get(sentiment, []) + f.readlines()
+                with open(f'files/output/{dataset}_dataset.csv','a') as f:
+                    f.write(f'{index},"{text}",{sentiment}\n')
+
+
+
+pregunta_01()
